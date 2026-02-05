@@ -65,5 +65,7 @@ async def process_message(
             return ScamResponse(status="success", reply="Thank you for the information. I'll get back to you.")
 
     except Exception as e:
+        import traceback
         print(f"Error processing message: {e}")
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
