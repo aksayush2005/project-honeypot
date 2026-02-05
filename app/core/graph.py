@@ -98,15 +98,15 @@ def generate_human_reply(state: AgentState):
 def extract_intelligence(state: AgentState):
     llm = ChatGroq(model_name="llama-3.1-8b-instant", temperature=0, api_key=settings.GROQ_API_KEY)
     
-    from langchain_core.pydantic_v1 import BaseModel as LangchainBaseModel, Field as LangchainField
+    from pydantic import BaseModel, Field
 
-    class IntelligenceSchema(LangchainBaseModel):
-        bankAccounts: List[str] = LangchainField(default_factory=list, description="List any bank account numbers mentioned by the scammer")
-        upiIds: List[str] = LangchainField(default_factory=list, description="List any UPI IDs mentioned by the scammer")
-        phishingLinks: List[str] = LangchainField(default_factory=list, description="List any suspicious URLs or links provided")
-        phoneNumbers: List[str] = LangchainField(default_factory=list, description="List any phone numbers the scammer wants you to call or message")
-        suspiciousKeywords: List[str] = LangchainField(default_factory=list, description="Key phrases like 'urgent', 'blocked', 'KYC', 'lottery'")
-        agentNotes: str = LangchainField(description="Summary of the scammer's tactic and behavior")
+    class IntelligenceSchema(BaseModel):
+        bankAccounts: List[str] = Field(default_factory=list, description="List any bank account numbers mentioned by the scammer")
+        upiIds: List[str] = Field(default_factory=list, description="List any UPI IDs mentioned by the scammer")
+        phishingLinks: List[str] = Field(default_factory=list, description="List any suspicious URLs or links provided")
+        phoneNumbers: List[str] = Field(default_factory=list, description="List any phone numbers the scammer wants you to call or message")
+        suspiciousKeywords: List[str] = Field(default_factory=list, description="Key phrases like 'urgent', 'blocked', 'KYC', 'lottery'")
+        agentNotes: str = Field(description="Summary of the scammer's tactic and behavior")
 
     structured_llm = llm.with_structured_output(IntelligenceSchema)
     
