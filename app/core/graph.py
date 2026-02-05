@@ -44,7 +44,8 @@ def init_state(session_id: str, history: List[ApiMessage], current_message: ApiM
     }
 
 def analyze_intent(state: AgentState):
-    llm = ChatGroq(model_name="llama-3.3-70b-versatile", temperature=0, api_key=settings.GROQ_API_KEY)
+    # Use a faster model for intent analysis to avoid Vercel timeouts
+    llm = ChatGroq(model_name="llama-3.1-8b-instant", temperature=0, api_key=settings.GROQ_API_KEY)
     
     # Analyze the whole conversation context
     conversation_text = "\n".join([f"{msg.type}: {msg.content}" for msg in state["messages"] if not isinstance(msg, SystemMessage)])
@@ -111,7 +112,15 @@ def extract_intelligence(state: AgentState):
     
     conversation_text = "\n".join([f"{msg.type}: {msg.content}" for msg in state["messages"] if not isinstance(msg, SystemMessage)])
     
-    intelligence_data = structured_llm.invoke(f"Extract all possible intelligence from this scam conversation:\n\n{conversation_text}")
+    try:
+        intelligence_data = structured_llm.invoke(f"Extract all possible intelligence from this scam conversation:\n\n{conversation_text}")
+    except Exception as e:
+        print(f"Structured output failed: {e}")
+        # Return empty intelligence if structured extraction fails
+        return {
+            "intelligence": ExtractedIntelligence(),
+            "agentNotes": "Extraction failed, but scam was already detected."
+        }
     
     return {
         "intelligence": ExtractedIntelligence(
