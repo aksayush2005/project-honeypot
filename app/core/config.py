@@ -8,10 +8,10 @@ class Settings:
     API_V1_STR: str = "/api/v1"
     
     # Security
-    YOUR_SECRET_API_KEY: str = os.getenv("YOUR_SECRET_API_KEY", "default_secret_key")
+    YOUR_SECRET_API_KEY: str = os.getenv("YOUR_SECRET_API_KEY", "default_secret_key").strip('"')
     
     # LLM Provider
-    GROQ_API_KEY: str = os.getenv("GROQ_API_KEY")
+    GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "").strip('"')
     
     # External Services
     CALLBACK_URL: str = "https://hackathon.guvi.in/api/updateHoneyPotFinalResult"
