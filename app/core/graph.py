@@ -73,7 +73,7 @@ def analyze_intent(state: AgentState):
     return {"scamDetected": is_scam}
 
 def generate_human_reply(state: AgentState):
-    llm = ChatGroq(model_name="llama-3.3-70b-versatile", temperature=0.7, api_key=settings.GROQ_API_KEY)
+    llm = ChatGroq(model_name="llama-3.1-8b-instant", temperature=0.7, api_key=settings.GROQ_API_KEY)
     
     persona = f"""
     You are a normal person receiving messages on {state['metadata'].get('channel', 'SMS')}.
@@ -96,7 +96,7 @@ def generate_human_reply(state: AgentState):
     return {"reply": response.content, "messages": state["messages"] + [AIMessage(content=response.content)]}
 
 def extract_intelligence(state: AgentState):
-    llm = ChatGroq(model_name="llama-3.3-70b-versatile", temperature=0, api_key=settings.GROQ_API_KEY)
+    llm = ChatGroq(model_name="llama-3.1-8b-instant", temperature=0, api_key=settings.GROQ_API_KEY)
     
     from langchain_core.pydantic_v1 import BaseModel as LangchainBaseModel, Field as LangchainField
 

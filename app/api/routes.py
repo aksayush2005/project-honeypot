@@ -8,9 +8,11 @@ from app.core.config import settings
 router = APIRouter()
 
 def verify_api_key(x_api_key: str = Header(...)):
-    if x_api_key != settings.YOUR_SECRET_API_KEY:
+    # Clean incoming key
+    clean_key = x_api_key.strip().strip('"').strip("'")
+    if clean_key != settings.YOUR_SECRET_API_KEY:
         raise HTTPException(status_code=403, detail="Invalid API Key")
-    return x_api_key
+    return clean_key
 
 graph = create_graph()
 
