@@ -18,6 +18,10 @@ app.add_middleware(
 
 app.include_router(router)
 
+@app.get("/")
+async def root():
+    return {"message": "Agentic Honey-Pot API is running. Visit /docs for API documentation."}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
