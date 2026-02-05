@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Honeypot API Endpoint Tester</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            color: var(--text);
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        #result {
+            margin-top: 2rem;
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .status-success {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-error {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        pre {
+            background-color: #0f172a;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            font-size: 0.875rem;
+            color: #e2e8f0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Honeypot Endpoint Tester</h1>
+        <p class="subtitle">Validate your API deployment and security configuration</p>
+        
+        <form id="testForm">
+            <div class="form-group">
+                <label for="apiUrl">API Endpoint URL</label>
+                <input type="url" id="apiUrl" required placeholder="https://your-api.com/api/v1/process-message" value="http://localhost:8000/process-message">
+            </div>
+            
+            <div class="form-group">
+                <label for="apiKey">API Key</label>
+                <input type="password" id="apiKey" required placeholder="Enter your x-api-key" value="default_secret_key">
+            </div>
+
+            <button type="submit" id="testBtn">Test Honeypot Endpoint</button>
+        </form>
+
+        <div id="result">
+            <div id="statusBadge" class="status-badge"></div>
+            <pre id="responseOutput"></pre>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('testForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('testBtn');
+            const resultDiv = document.getElementById('result');
+            const statusBadge = document.getElementById('statusBadge');
+            const responseOutput = document.getElementById('responseOutput');
+            const apiUrl = document.getElementById('apiUrl').value.trim();
+            const apiKey = document.getElementById('apiKey').value.trim();
+
+            // Reset UI
+            btn.disabled = true;
+            btn.textContent = 'Testing...';
+            resultDiv.style.display = 'none';
+            responseOutput.textContent = '';
+
+            try {
+                const payload = {
+                    sessionId: "test-session-" + Date.now(),
+                    message: {
+                        sender: "scammer",
+                        text: "Hello, I have a business proposal for you.",
+                        timestamp: Date.now()
+                    },
+                    conversationHistory: [],
+                    metadata: {
+                        channel: "WebTester",
+                        language: "English",
+                        locale: "US"
+                    }
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': apiKey
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json().catch(() => ({ error: "Invalid JSON response" }));
+                
+                resultDiv.style.display = 'block';
+                
+                if (response.ok) {
+                    statusBadge.textContent = `Success (${response.status})`;
+                    statusBadge.className = 'status-badge status-success';
+                } else {
+                    statusBadge.textContent = `Error (${response.status})`;
+                    statusBadge.className = 'status-badge status-error';
+                }
+
+                responseOutput.textContent = JSON.stringify(data, null, 2);
+
+            } catch (error) {
+                resultDiv.style.display = 'block';
+                statusBadge.textContent = 'Network Error';
+                statusBadge.className = 'status-badge status-error';
+                responseOutput.textContent = `Failed to connect:\n${error.message}\n\nCheck CORS settings and if URL is correct.`;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Test Honeypot Endpoint';
+            }
+        });
+    </script>
+</body>
+</html>
