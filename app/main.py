@@ -7,13 +7,12 @@ load_dotenv()
 
 app = FastAPI(title="Agentic Honey-Pot API")
 
-# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
+    allow_origins=["*"],  
     allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
+    allow_methods=["*"],  
+    allow_headers=["*"], 
 )
 
 app.include_router(router)

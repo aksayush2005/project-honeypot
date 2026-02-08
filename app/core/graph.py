@@ -20,7 +20,6 @@ class AgentState(TypedDict):
 
 def init_state(session_id: str, history: List[ApiMessage], current_message: ApiMessage, metadata: Dict[str, str] = None) -> AgentState:
     messages = []
-    # Add a system message to set the stage if it's the beginning
     if not history:
         messages.append(SystemMessage(content="New conversation started."))
         
@@ -44,10 +43,9 @@ def init_state(session_id: str, history: List[ApiMessage], current_message: ApiM
     }
 
 def analyze_intent(state: AgentState):
-    # Use a faster model for intent analysis to avoid Vercel timeouts
+
     llm = ChatGroq(model_name="llama-3.1-8b-instant", temperature=0, api_key=settings.GROQ_API_KEY)
-    
-    # Analyze the whole conversation context
+
     conversation_text = "\n".join([f"{msg.type}: {msg.content}" for msg in state["messages"] if not isinstance(msg, SystemMessage)])
     
     prompt = f"""
@@ -86,9 +84,7 @@ def generate_human_reply(state: AgentState):
     - Keep replies short and human-like.
     """
     
-    # Prepare messages for LLM
     llm_messages = [SystemMessage(content=persona)]
-    # Filter out our own internal SystemMessages if any
     llm_messages.extend([msg for msg in state["messages"] if not isinstance(msg, SystemMessage)])
     
     response = llm.invoke(llm_messages)

@@ -5,13 +5,11 @@ from app.api.routes import verify_api_key
 from app.api.schemas import ExtractedIntelligence
 import time
 
-# Override the API key dependency to bypass actual auth check
 app.dependency_overrides[verify_api_key] = lambda: "test_key"
 
 client = TestClient(app)
 
 def test_flow():
-    # Mock the graph.invoke method to return a standard result
     mock_intelligence = ExtractedIntelligence(
         bankAccounts=[],
         upiIds=[],
@@ -28,11 +26,9 @@ def test_flow():
         "totalMessages": 1
     }
 
-    # IMPORTANT: Start the patch where 'graph' is used/imported in the route handler
     with patch("app.api.routes.graph") as mock_graph:
         mock_graph.invoke.return_value = mock_result
         
-        # 1. First Message
         response = client.post(
             "/process-message",
             headers={"x-api-key": "test_key"},
