@@ -18,7 +18,7 @@ This project provides a **production-ready backend architecture** that can be ex
 ## Technology Stack
 
 - **Python 3.10+**
-- **FastAPI** – asynchronous REST API framewor k
+- **FastAPI** – asynchronous REST API framework
 - **Pydantic** – request and response validation
 - **LangChain** – LLM orchestration
 - **LangGraph** – stateful agentic workflow management
